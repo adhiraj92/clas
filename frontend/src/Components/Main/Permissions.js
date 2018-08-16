@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import AddSubscriber from './AddSubscriber';
 import Button from '@material-ui/core/Button';
-import RadioGroup from '@material-ui/core/RadioGroup';
 import SimpleCard from './Card';
 import CardActions from '@material-ui/core/CardActions';
 import CustomizedTable from './Table';
@@ -30,18 +29,19 @@ const styles = {
 class Permissions extends React.Component {
   state = {
     roles: [],
-    selectedRole: 'Administrator',
+    selectedRole: '',
   };
 
-  handleChange = (event) => {
-    console.log(event.target);
-    this.setState({ selectedRole: event.target.value });
+  handleClick = (event) => {
+    this.setState({ selectedRole: event.target.getAttribute("role") }, () => {
+      console.log(this.state.selectedRole)
+    });
   };
 
   componentWillMount() {
     fetch('/api/backend/roles')
     .then((data) => data.json())
-    .then((roles) => this.setState({roles}));
+    .then((roles) => this.setState({roles}, () => this.setState({selectedRole: this.state.roles[0].name})));
   }
 
   render() {
@@ -51,8 +51,8 @@ class Permissions extends React.Component {
       .sort((a, b) => a.rank > b.rank)
       .map((item) =>
       <CardActions key={item.rank}>
-        <Button size="small" className={classes.card}>
-          <SimpleCard name={item.name} number={item.count} />
+        <Button size="small" className={classes.card} onClick={this.handleClick}>
+          <SimpleCard name={item.name} count={item.count} isSelected={item.name === this.state.selectedRole ? true : false} />
         </Button>
       </CardActions>
     );
@@ -63,9 +63,9 @@ class Permissions extends React.Component {
           <p className={classes.heading}>User Permissions</p>
           <AddSubscriber />
         </div>
-        <RadioGroup name="roles" className={classes.cards} value={this.state.selectedRole} onChange={this.handleChange}>
+        <div className={classes.cards}>
           {cards}
-        </RadioGroup>
+        </div>
         <p className={classes.heading}>Administrators</p>
         <CustomizedTable />
       </div>

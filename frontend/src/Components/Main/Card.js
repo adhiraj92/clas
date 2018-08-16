@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
@@ -9,10 +10,15 @@ const styles = {
   card: {
     borderRadius: 0,
     boxShadow: 'none',
-    borderTopColor: 'black',
     borderTopStyle: 'solid',
     borderTopWidth: 8,
     minWidth: 150,
+  },
+  active: {
+    borderTopColor: 'blue',
+  },
+  inactive: {
+    borderTopColor: 'black',
   },
   title: {
     marginBottom: 16,
@@ -20,23 +26,33 @@ const styles = {
   },
 };
 
-function SimpleCard(props) {
-  const { classes, name, number } = props;
+class SimpleCard extends React.Component {
+  state = {
+    isSelected: this.props.isSelected,
+  }
 
-  return (
-    <div>
-      <Card className={classes.card}>
-        <CardContent>
-          <Typography className={classes.title} color="textSecondary">
-            {name}
-          </Typography>
-          <Typography variant="headline" component="h1">
-            {number}
-          </Typography>
-        </CardContent>
-      </Card>
-    </div>
-  );
+  componentWillReceiveProps(nextProps) {
+    this.setState({ isSelected: nextProps.isSelected });
+  }
+
+  render() {
+    const { classes, name, count } = this.props;
+
+    return (
+      <div>
+        <Card className={classNames(classes.card, this.state.isSelected ? classes.active : classes.inactive)} role={name}>
+          <CardContent role={name}>
+            <Typography className={classes.title} color="textSecondary" role={name}>
+              {name}
+            </Typography>
+            <Typography variant="headline" component="h1" role={name}>
+              {count}
+            </Typography>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 }
 
 SimpleCard.propTypes = {
